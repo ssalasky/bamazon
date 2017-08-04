@@ -1,0 +1,24 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "mini online store",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "node bamazonCustomer.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ssalasky/bamazon.git"
+  },
+  "author": "Sam Salasky",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ssalasky/bamazon/issues"
+  },
+  "homepage": "https://github.com/ssalasky/bamazon#readme",
+  "dependencies": {
+    "console.table": "^0.8.0",
+    "inquirer": "^3.2.1",
+    "mysql": "^2.14.1"
+  }
+}
