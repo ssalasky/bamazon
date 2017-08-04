@@ -31,7 +31,7 @@ function action() {
 }
 
 function viewSales() {
-	connection.query("select departments.department_name, departments.over_head_costs, sum(products.product_sales) from departments join products on departments.department_name = products.department_name group by 1, 2",
+	connection.query("select departments.department_name, departments.over_head_costs, sum(products.product_sales), sum(products.product_sales - departments.over_head_costs) as total_profit from departments join products on departments.department_name = products.department_name group by 1, 2",
 	 function(err, res) {
 		if (err) throw err;
 		console.table(res);

@@ -13,6 +13,8 @@ var table = require("console.table");
 //establishing global variables
 var userItem = 0;
 var userQty = 0;
+var quantity = 0;
+var sales = 0;
 
 //testing connection to database
 connection.connect(function(err) {
@@ -47,43 +49,61 @@ function userAction() {
 		userItem = parseInt(inquirerResponse.item);
 		userQty = parseInt(inquirerResponse.qty);
 
-		connection.query("select item_id, stock_quantity, price from products where ?", {item_id: userItem}, function(err, res) {
+		connection.query("select item_id, stock_quantity, price, product_sales from products where ?", {item_id: userItem}, function(err, res) {
 			if (err) throw err;
+
+			var stock = res[0].stock_quantity;
 			
-			if (userQty > res.stock_quantity) {
+			if (userQty > stock) {
 				console.log("Insufficient stock to complete purchase. Please try again.");
 				readProducts();
 				userAction();
 			} else {
-				console.table(res);
-				var quantity = parseInt(res.stock_quantity) - userQty;
-				var sales = userQty * parseInt(res.price);
+				quantity = stock - userQty;
+				var sale = (userQty * res[0].price);
+				sales = sale + res[0].product_sales;
 
-				console.log(quantity);
-				console.log(sales);
-				// updateProduct(quantity);
+				console.log("Total: $" + sale);
+
+				updateProduct();
 			}
 		});
 	});
 }
 
-// function updateProduct(quantity) {
-// 	connection.query("update products set ? where ?",
-// 		[
-// 			{
-// 				stock_quantity: quantity
-// 				product_sales: 
-// 			},
-// 			{
-// 				item_id: userItem
-// 			}
-// 		], function(error) {
-// 			if (error) throw err;
-// 			console.log()
-// 		}
-// 	)
-// }
+function updateProduct() {
+	connection.query("update products set ? where ?",
+		[
+			{
+				stock_quantity: quantity,
+				product_sales: sales
+			},
+			{
+				item_id: userItem
+			}
+		], function(error, res) {
+			if (error) throw err;
+			newPurchase();
+		}
+	);
+};
 
-
+function newPurchase() {
+	inquirer.prompt(
+		{
+			type: "list",
+			message: "Would you like to make another purchase?",
+			choices: ["Yes", "No"],
+			name: "again"
+		}
+	).then(function(answer) {
+		if (answer.again === "Yes") {
+			readProducts();
+		} else {
+			console.log("Thank you for shopping with us.");
+			connection.end();
+		}
+	})
+}
 
 readProducts();
